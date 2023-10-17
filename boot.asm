@@ -2,8 +2,19 @@
 
         org     0       
         bits    16    ; use 16 bit architecture, because during the boot process, real mode is on which only works on 16 bits
-        jmp     0x7c0:start ; make code segment to 0x7c0
+
+
+;--------------------bios parameter block;-------------------;
+_start: ; first 3 bytes of the bios parameter block
+        jmp short start
+        nop
+times 33 db 0 ; create 33 bytes after the short jump
+;------------------------------------------------------------;
+
 start:
+        jmp     0x7c0:step2 ; make code segment to 0x7c0
+
+step2:
         cli ; clear interrupt flags, to disable interrupts to change segment registers so hardware interrupts do not interfere
         ; change data segments
         mov     ax, 0x7c0
