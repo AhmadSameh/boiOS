@@ -4,15 +4,16 @@
         bits    16    ; use 16 bit architecture, because during the boot process, real mode is on which only works on 16 bits
 
 
-;--------------------bios parameter block;-------------------;
+;--------------------;bios parameter block;-------------------;
 _start: ; first 3 bytes of the bios parameter block
         jmp short start
         nop
 times 33 db 0 ; create 33 bytes after the short jump
-;------------------------------------------------------------;
+;-------------------------------------------------------------;
 
 start:
         jmp     0x7c0:step2 ; make code segment to 0x7c0
+
 
 step2:
         cli ; clear interrupt flags, to disable interrupts to change segment registers so hardware interrupts do not interfere
@@ -25,8 +26,27 @@ step2:
         mov     ss, ax    
         mov     sp, 0x7c00 ; set stack pointer to 0x7c00
         sti ; enable interrupts 
-        mov     si, message ; a pointer to the start of the message we want to print
-        call    print  ; print the message 
+
+;--------------------;read from disk the old way, cylindrical;-------------------;
+; data is read from the disk into the extra segment, with BX the offset
+        mov     ah, 2 ; read sector command
+        mov     al, 1 ; read 1 sector
+        mov     ch, 0 ; cylinder number = 0
+        mov     cl, 2 ; sector number = 2
+        mov     dh, 0 ; head number = 0
+        mov     bx, buffer
+        int     0x13  ; invoke read command
+        jc      error
+;--------------------------------------------------------------------------------;
+
+        mov     si, buffer
+        call    print 
+        
+        jmp     $
+
+error:
+        mov     si, error_msg
+        call    print
         jmp     $  ; jump to the same line
 
 print:  ; function to print a string
@@ -45,6 +65,10 @@ print_char:  ; function to print a singular character
         int     0x10      ; to print a character
         ret
 
-message: db 'Hello World!', 0 ; define the message we want to print
+error_msg: db   'Failed to load sector!'
+
 times   510-($ - $$) db 0 ; make sure the code is at least 510 bytes by padding 0s to the end of the written code
 dw      0xaa55            ; sp that the boot signal is at bytes 511 and 513
+
+buffer: ; this is to write to it from disk
+        ; even though it is beyond the bootlader space, it can still be refrenced but not accessed by the bootloader
