@@ -29,19 +29,18 @@ step2:
 
 .load_protected:
         cli
-        lgdt[gdt_descriptor]
+        lgdt[gdt_descriptor] ; load lgdt registers with addres of gdt_descriptor
         mov     eax, cr0
         or      eax, 0x01
         mov     cr0, eax
-        jmp     CODE_SEG:load32
+        jmp     CODE_SEG:load32 ; move the cs to the code segment
 
-;GDT
+;--------------------;global descriptor table;-------------------;
 gdt_start:
-
+; first entry is always null
 gdt_null:
         dd      0x00
         dd      0x00
-
 ;offset 0x8
 gdt_code:       ; CS should point to this
         dw      0xffff  ; segment limit first 0-15 bits
@@ -63,9 +62,12 @@ gdt_end:
 gdt_descriptor:
         dw      gdt_end - gdt_start - 1
         dd      gdt_start
+;----------------------------------------------------------------;
+
 
 [BITS 32]
-load32:
+load32: 
+        ; put the data segment into all the other segments
         mov     ax, DATA_SEG
         mov     ds, ax
         mov     es, ax
@@ -74,6 +76,12 @@ load32:
         mov     ss, ax
         mov     ebp, 0x00200000
         mov     esp, ebp
+
+        ; enable a20 line which allows access to the 21st bit of any memory access
+        in      al, 0x02
+        or      al, 2
+        out     0x92, al
+
         jmp     $
 
 times   510-($ - $$) db 0 ; make sure the code is at least 510 bytes by padding 0s to the end of the written code
