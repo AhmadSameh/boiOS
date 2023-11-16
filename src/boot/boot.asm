@@ -64,25 +64,65 @@ gdt_descriptor:
         dd      gdt_start
 ;----------------------------------------------------------------;
 
-
+;--------------------;load the kernel into memory;-------------------;
 [BITS 32]
-load32: 
-        ; put the data segment into all the other segments
-        mov     ax, DATA_SEG
-        mov     ds, ax
-        mov     es, ax
-        mov     fs, ax
-        mov     gs, ax
-        mov     ss, ax
-        mov     ebp, 0x00200000
-        mov     esp, ebp
+load32:
+        mov     eax, 1 ; starting sector we want to load from
+        mov     ecx, 100 ; the total number of sectors we want to load
+        mov     edi, 0x0100000 ; address we want to load them into
+        call    ata_lba_read
+        jmp     CODE_SEG:0x0100000
 
-        ; enable a20 line which allows access to the 21st bit of any memory access
-        in      al, 0x02
-        or      al, 2
-        out     0x92, al
+; dummy driver to get kernel loaded
+ata_lba_read:
+        mov     ebx, eax ; backup LBA
+        ; send highest 8 bits of lba to hard disk controller
+        shr     eax, 24
+        or      eax, 0xe0 ; select master drive
+        mov     dx, 0x1f6 ; port to write 8 bits to
+        out     dx, al ; finished sending 8 bits to the lba
+        ; send total sectors to read
+        mov     eax, ecx 
+        mov     dx, 0x1f2
+        out     dx, al ; finished sending
+        ; send more bits of lba
+        mov     eax, ebx ; restore backup lba
+        mov     dx, 0x1f3
+        out     dx, al ; finished sending
+        ; send more bits of lba
+        mov     dx, 0x1f4
+        mov     eax, ebx ; restore backup lba
+        shr     eax, 8
+        out     dx, al ; finished sending      
+        ; send upper 16 bits of lba
+        mov     dx, 0x1f5
+        mov     eax, ebx
+        shr     eax, 16
+        out     dx, al
 
-        jmp     $
+        mov     dx, 0x1f7
+        mov     al, 0x20
+        out     dx, al
+
+; read all sectors into memory
+.next_sector:
+        push    ecx
+
+; check if we need to read
+.try_again:
+        mov     dx, 0x1f7
+        in      al, dx
+        test    al, 8
+        jz      .try_again
+        ; read 256 words at a time
+        mov     ecx, 256
+        mov     dx, 0x1f0
+        rep     insw  ; does insw instruction 256 times, stored in ecx
+        pop     ecx
+        loop    .next_sector ; decrement ecx and jump to .next_sector
+        ; end of reading sectors
+        ret
+;--------------------------------------------------------------------;
 
 times   510-($ - $$) db 0 ; make sure the code is at least 510 bytes by padding 0s to the end of the written code
 dw      0xaa55            ; sp that the boot signal is at bytes 511 and 513
