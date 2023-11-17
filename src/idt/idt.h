@@ -19,5 +19,9 @@ struct idtr_desc{
 void idt_init(void);
 void idt_set(int interrupt_no, void* address);
 extern void idt_load(struct idtr_desc* ptr);
+extern void int21h(void);
+extern void no_interrupt(void);
+void int21h_handler(void);
+void no_interrupt_handler(void);
 
 #endif
