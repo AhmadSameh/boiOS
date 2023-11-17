@@ -3,8 +3,8 @@
         org    0x7c00
         bits    16       ; use 16 bit architecture, because during the boot process, real mode is on which only works on 16 bits
 
-CODE_SEG equ gdt_code - gdt_start
-DATA_SEG equ gdt_data - gdt_start 
+        CODE_SEG equ gdt_code - gdt_start
+        DATA_SEG equ gdt_data - gdt_start 
 
 ;--------------------;bios parameter block;-------------------;
 _start: ; first 3 bytes of the bios parameter block
@@ -65,7 +65,7 @@ gdt_descriptor:
 ;----------------------------------------------------------------;
 
 ;--------------------;load the kernel into memory;-------------------;
-[BITS 32]
+        bits    32
 load32:
         mov     eax, 1 ; starting sector we want to load from
         mov     ecx, 100 ; the total number of sectors we want to load
@@ -73,7 +73,7 @@ load32:
         call    ata_lba_read
         jmp     CODE_SEG:0x0100000
 
-; dummy driver to get kernel loaded
+; dummy disk driver to get kernel loaded and load sectors into memory
 ata_lba_read:
         mov     ebx, eax ; backup LBA
         ; send highest 8 bits of lba to hard disk controller

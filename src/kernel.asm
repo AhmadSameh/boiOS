@@ -1,12 +1,12 @@
-[BITS 32]
+        bits 32
 
-        global _start
-
-        CODE_SEG    equ 0x08
-        DATA_SEG    equ 0x10
+        global  _start
+        extern  kernel_main
+        CODE_SEG        equ 0x08
+        DATA_SEG        equ 0x10
 
 _start: 
-        ; put the data segment into all the other segments
+        ; put the data segment into all the other segments, gdt
         mov     ax, DATA_SEG
         mov     ds, ax
         mov     es, ax
@@ -21,4 +21,8 @@ _start:
         or      al, 2
         out     0x92, al
 
+        call kernel_main
+
         jmp     $
+
+times   512-($ - $$) db 0 
