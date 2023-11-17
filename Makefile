@@ -1,4 +1,4 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/terminal/terminal.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/memory/memory.o ./build/string/string.o ./build/io/io.asm.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -25,6 +25,28 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/kernel.o: ./src/kernel.c
 	i686-elf-gcc $(INCLUDES) $(FLAGS) -std=gnu99 -c ./src/kernel.c -o ./build/kernel.o
 
+./build/terminal/terminal.o: ./src/terminal/terminal.c
+	i686-elf-gcc $(INCLUDES) -I./src/terminal $(FLAGS) -std=gnu99 -c ./src/terminal/terminal.c -o ./build/terminal/terminal.o
+
+./build/idt/idt.asm.o: ./src/idt/idt.asm
+	nasm -f elf -g ./src/idt/idt.asm -o ./build/idt/idt.asm.o
+
+./build/idt/idt.o: ./src/idt/idt.c
+	i686-elf-gcc $(INCLUDES) -I./src/idt $(FLAGS) -std=gnu99 -c ./src/idt/idt.c -o ./build/idt/idt.o
+
+./build/memory/memory.o: ./src/memory/memory.c
+	i686-elf-gcc $(INCLUDES) -I./src/memory $(FLAGS) -std=gnu99 -c ./src/memory/memory.c -o ./build/memory/memory.o
+
+./build/string/string.o: ./src/string/string.c
+	i686-elf-gcc $(INCLUDES) -I./src/string $(FLAGS) -std=gnu99 -c ./src/string/string.c -o ./build/string/string.o
+
+./build/io/io.asm.o: ./src/io/io.asm
+	nasm -f elf -g ./src/io/io.asm -o ./build/io/io.asm.o
+
 clean:
-	rm -rf ./bin/*
-	rm -rf ./build/*
+	rm -rf ./bin/*.bin
+	rm -rf ./build/*.o
+	rm -rf ./build/terminal/*.o
+	rm -rf ./build/memory/*.o
+	rm -rf ./build/idt/*.o
+	rm -rf ./build/string/*.o
