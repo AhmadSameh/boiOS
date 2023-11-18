@@ -1,9 +1,4 @@
 #include "idt.h"
-#include "kernel.h"
-#include "terminal/terminal.h"
-#include "config.h"
-#include "memory/memory.h"
-#include "io/io.h"
 
 struct idt_desc idt_descriptors[BOIOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;

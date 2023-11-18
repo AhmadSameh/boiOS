@@ -1,5 +1,19 @@
 {
     "files.associations": {
-        "string.h": "c"
-    }
+        "string.h": "c",
+        "config.h": "c",
+        "status.h": "c"
+    },
+    "python.autoComplete.extraPaths": [
+        "/home/boi/work_stuff/control/install/controller/lib/python3.10/site-packages",
+        "/home/boi/work_stuff/control/install/controller_interface/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/boi/work_stuff/control/install/controller/lib/python3.10/site-packages",
+        "/home/boi/work_stuff/control/install/controller_interface/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
 }

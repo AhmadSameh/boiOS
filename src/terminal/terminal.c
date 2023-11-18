@@ -1,5 +1,4 @@
 #include "terminal.h"
-#include "../string/string.h"
 
 struct terminal terminal;
 
