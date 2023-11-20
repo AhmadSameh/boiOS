@@ -1,8 +1,11 @@
 #include "paging.h"
+#include "../../status.h"
 
 static uint32_t* current_directory = 0;
 
 void paging_load_directory(uint32_t* directory);
+int paging_get_indexes(void* virtual_address, uint32_t* directory_index_out, uint32_t* table_index_out);
+bool paging_is_aligned(void* address);
 
 // function gives a linear memory space, so virtual memory address is the same as the physical memory
 struct paging_4gb_chunk* paging_new_4gb(uint8_t flags){
@@ -34,4 +37,40 @@ uint32_t* paging_4gb_chunk_get_directory(struct paging_4gb_chunk* chunk){
 void paging_switch(uint32_t* directory){
     paging_load_directory(directory); 
     current_directory = directory;
+}
+
+int paging_get_indexes(void* virtual_address, uint32_t* directory_index_out, uint32_t* table_index_out){
+    int response = 0;
+    // ensure if virtual address is aligned and a valid paging address
+    if(!paging_is_aligned(virtual_address)){
+        response = -EINVARG;
+        goto out;
+    }
+    // calculate directory entry index and table entry index in the paging directory from the given virtual address
+    *directory_index_out = ((uint32_t)virtual_address) / (PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE);
+    *table_index_out = ((uint32_t)virtual_address % (PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE) / PAGING_PAGE_SIZE); 
+out:
+    return response;
+}
+
+int paging_set(uint32_t* directory, void* virtual_address, uint32_t value_of_entry){
+    // ensure if virtual address is aligned and a valid paging address
+    if(!paging_is_aligned(virtual_address))
+        return -EINVARG;
+    uint32_t directory_index = 0;
+    uint32_t table_index = 0;
+    // get directory and table indexes from virtual address
+    int response = paging_get_indexes(virtual_address, &directory_index, &table_index);
+    if(response < 0)
+        return response;
+    // etnry is taken from the directory array using the calculated directory index and so is the table from upper 20 bits of entry
+    uint32_t entry = directory[directory_index];
+    uint32_t* table = (uint32_t*)(entry & 0xFFFFF000);
+    // set the table index to the given entry value
+    table[table_index] = value_of_entry;
+    return 0;
+}
+
+bool paging_is_aligned(void* address){
+    return ((uint32_t)address % PAGING_PAGE_SIZE) == 0;
 }

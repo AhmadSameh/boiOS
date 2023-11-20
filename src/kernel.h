@@ -9,6 +9,4 @@
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
 
-void kernel_main(void);
-
 #endif
