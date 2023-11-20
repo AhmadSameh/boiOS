@@ -12,4 +12,6 @@
 #define BOIOS_HEAP_ADDRESS      0x01000000 // starting address of heap data pool
 #define BOIOS_HEAP_TABLE_ADDRESS 0x00007E00 // starting address of heap table
 
+#define BOIOS_SECTOR_SIZE 512
+
 #endif

@@ -1,4 +1,6 @@
-#include "../io/io.h"
+#include "disk.h"
+
+struct disk disk;
 
 // from from primary hard disk
 int disc_read_sector(int lba, int total_blocks, void* buf){
@@ -27,4 +29,22 @@ int disc_read_sector(int lba, int total_blocks, void* buf){
     }
 
     return 0;
+}
+
+void disk_search_and_init(){
+    memset(&disk, 0, sizeof(disk));
+    disk.type = BOIOS_DISK_TYPE_REAL;
+    disk.sector_size = BOIOS_SECTOR_SIZE;
+}
+
+struct disk* disk_get(int index){
+    if(index != 0)
+        return 0;
+    return &disk;
+}
+
+int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf){
+    if(idisk != &disk)
+        return -EIO;
+    return disc_read_sector(lba, total, buf);
 }

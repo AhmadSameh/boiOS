@@ -1,5 +1,6 @@
 #include "kernel.h"
 
+
 static struct paging_4gb_chunk* kernel_chunk = 0;
 
 void kernel_main(){
@@ -10,6 +11,9 @@ void kernel_main(){
     // initialize the heap
     kheap_init();
 
+    // search and initialize disks
+    disk_search_and_init();
+
     // initialize interrupt descriptor table
     idt_init();
 
@@ -19,9 +23,6 @@ void kernel_main(){
     paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
     // enable paging
     enable_paging();
-
-    char buf[512];
-    disc_read_sector(0, 1, buf);
 
     // enable interrupts
     enable_interrupts();
