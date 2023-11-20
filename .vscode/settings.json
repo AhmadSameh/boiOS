@@ -2,7 +2,14 @@
     "files.associations": {
         "string.h": "c",
         "config.h": "c",
-        "status.h": "c"
+        "status.h": "c",
+        "kernel.h": "c",
+        "idt.h": "c",
+        "memory.h": "c",
+        "stdint.h": "c",
+        "terminal.h": "c",
+        "kheap.h": "c",
+        "heap.h": "c"
     },
     "python.autoComplete.extraPaths": [
         "/home/boi/work_stuff/control/install/controller/lib/python3.10/site-packages",

@@ -5,8 +5,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "memory/memory.h"
-#include "../../status.h"
-#include "../../config.h"
+#include "status.h"
+#include "config.h"
 
 #define HEAP_BLOCK_TABLE_ENTRY_FREE     0x00
 #define HEAP_BLOCK_TABLE_ENTRY_TAKEN    0x01

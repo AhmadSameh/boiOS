@@ -33,9 +33,6 @@ _start:
         out     0x21, al
         ; end remap master PIC
 
-        ; enable interrupts, processor has to enable interrupts so that they are not ignored 
-        sti 
-
         call kernel_main
 
         jmp     $
