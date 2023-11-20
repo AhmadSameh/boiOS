@@ -20,6 +20,9 @@ void kernel_main(){
     // enable paging
     enable_paging();
 
+    char buf[512];
+    disc_read_sector(0, 1, buf);
+
     // enable interrupts
     enable_interrupts();
 }
