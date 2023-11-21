@@ -27,8 +27,9 @@ void kernel_main(){
     // enable interrupts
     enable_interrupts();
 
-    struct path_root* root_path = pathparser_parse("0:/bin/shell.exe", NULL);
-    if(root_path){
-        
-    }
+    struct disk_stream* stream = diskstreamer_new(0);
+    diskstreamer_seek(stream, 0x201);
+    unsigned char c = 0;
+    diskstreamer_read(stream, &c, 1);
+    while(1);
 }
