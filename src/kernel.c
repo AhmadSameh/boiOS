@@ -26,4 +26,9 @@ void kernel_main(){
 
     // enable interrupts
     enable_interrupts();
+
+    struct path_root* root_path = pathparser_parse("0:/bin/shell.exe", NULL);
+    if(root_path){
+        
+    }
 }

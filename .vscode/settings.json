@@ -9,7 +9,12 @@
         "stdint.h": "c",
         "terminal.h": "c",
         "kheap.h": "c",
-        "heap.h": "c"
+        "heap.h": "c",
+        "paging.h": "c",
+        "*.ipp": "c",
+        "cstring": "c",
+        "*.tcc": "c",
+        "algorithm": "c"
     },
     "python.autoComplete.extraPaths": [
         "/home/boi/work_stuff/control/install/controller/lib/python3.10/site-packages",
