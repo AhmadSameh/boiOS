@@ -7,11 +7,33 @@
         DATA_SEG equ gdt_data - gdt_start 
 
 ;--------------------;bios parameter block;-------------------;
-_start: ; first 3 bytes of the bios parameter block
+; first 3 bytes of the bios parameter block
         jmp short start
         nop
-times 33 db 0 ; create 33 bytes after the short jump
+; FAT16 header
+        OEMIdentifier           db 'BOIOS   '
+        BytesPerSector          dw 0x200 ; 512 bytes per sector, ignored by most kernels
+        SectorsPerCluster       db 0x80 
+        ReservedSectors         dw 200 ; space where entire kernel will be stored
+        FATCopies               db 0x02
+        RootDirEntries          dw 0x40 
+        NumSectors              dw 0x00
+        MediaType               db 0xf8
+        SectorsPerFat           dw 0x100
+        SectorPerTrack          dw 0x20
+        NumberOfHeads           dw 0x40
+        HiddenSectors           dd 0x00
+        SectorsBig              dd 0x773594
+; extended bpb (Dos 4.0)
+        DriveNumber             db 0x80
+        WinNTBit                db 0x00
+        Signature               db 0x29
+        VolumeID                dd 0xd105
+        VolumeIDString          db 'BOIOS BOOT '
+        SystemIDString          db 'FAT16   '
 ;-------------------------------------------------------------;
+
+
 
 start:
         jmp     0:step2 ; make code segment to 0x7c0

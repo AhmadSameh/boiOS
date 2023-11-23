@@ -14,4 +14,7 @@
 
 #define BOIOS_SECTOR_SIZE 512
 
+#define BOIOS_MAX_FILESYSTEMS       12
+#define BOIOS_MAX_FILE_DESCRIPTORS  512
+
 #endif
