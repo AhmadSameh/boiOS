@@ -11,6 +11,7 @@
 #include "disk/disk.h"
 #include "disk/streamer.h"
 #include "fs/pparser.h"
+#include "fs/file.h"
 
 
 #define BOIOS_MAX_PATH  128

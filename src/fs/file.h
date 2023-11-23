@@ -2,6 +2,7 @@
 #define FILE_H
 
 #include "pparser.h"
+#include "fat/fat16.h"
 #include "../config.h"
 #include "../status.h"
 #include "../terminal/terminal.h"
@@ -31,7 +32,7 @@ struct path_part;
 // function pointer which each file system will implement this function pointer and point it to its own function (fopen, fread, etc)
 typedef void*(*FS_OPEN_FUNCTION)(struct disk* disk, struct path_part* path, FILE_MODE mode);
 // filesystem will need to point it to its internal resolve function, takes disk and returns if it is valid (able to process the filesystem)
-typedef int*(*FS_RESOLVE_FUNCTION)(struct disk* disk);
+typedef int (*FS_RESOLVE_FUNCTION)(struct disk* disk);
 
 // each filesystem will have one of this structure, which acts as an interface communicates with the filesystem
 struct filesystem{
@@ -52,7 +53,7 @@ struct file_descriptor{
     struct disk* disk;
 };
 
-void fs_init();
+void fs_init(void);
 int fopen(const char* filename, const char* mode);
 void fs_insert_filesystem(struct filesystem* filesystem);
 struct filesystem* fs_resolve(struct disk* disk);

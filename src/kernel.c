@@ -11,6 +11,9 @@ void kernel_main(){
     // initialize the heap
     kheap_init();
 
+    // initialize filesystems
+    fs_init();
+
     // search and initialize disks
     disk_search_and_init();
 

@@ -15,7 +15,7 @@ static struct filesystem** fs_get_free_filesystem(){
 
 // load static filesystems, built in the core kernel
 static void fs_static_load(){
-    // fs_insert_filesystem(fat16_init());
+    fs_insert_filesystem(fat16_init());
 }
 
 static int file_new_descriptor(struct file_descriptor** desc_out){

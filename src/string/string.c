@@ -11,8 +11,7 @@ size_t strnlen(const char* str, size_t max){
     size_t len = 0;
     while(str[len])
         len++;
-    if(len >= max)
-        len = max;
+    len = len > max ? max : len;
     return len;
 }
 
@@ -22,4 +21,15 @@ bool isdigit(char c){
 
 int tonumericdigit(char c){
     return c - 48;
+}
+
+char* strcpy(char* dest, char* src){
+    char* res = dest;
+    while(*src){
+        *dest = *src;
+        src++;
+        dest++;
+    }
+    *dest = 0x00;
+    return res;
 }
