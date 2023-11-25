@@ -73,6 +73,67 @@ struct filesystem* fs_resolve(struct disk* disk){
     return fs;
 }
 
-int fopen(const char* filename, const char* mode){
-    return -EIO;
+FILE_MODE file_get_mode_by_string(const char* str){
+    FILE_MODE mode = FILE_MODE_INVALID;
+    if(strncmp(str, "r", 1) == 0)
+        mode = FILE_MODE_READ;
+    else if(strncmp(str, "w", 1) == 0)
+        mode = FILE_MODE_WRITE;
+    else if(strncmp(str, "a", 1) == 0)
+        mode = FILE_MODE_APPEND;
+    return mode;
+}
+
+int fopen(const char* filename, const char* mode_str){
+    int response = 0;
+    // first parse the path into path root and path parts
+    struct path_root* root_path = pathparser_parse(filename, NULL);
+    if(!root_path){
+        response = -EINVARG;
+        goto out;
+    }
+    // this is a root path e.g. 0:/, which we can not have
+    if(!root_path->first){
+        response = -EINVARG;
+        goto out;
+    }
+    // get the current disk first from file path
+    struct disk* disk = disk_get(root_path->drive_no);
+    // if disk is not found return error
+    if(!disk){
+        response = -EIO;
+        goto out;
+    }
+    // if the disk has no filesystem, return error
+    if(!disk->filesystem){
+        response = -EIO;
+        goto out;
+    }
+    // get mode of the open function, values are: read, write & append
+    FILE_MODE mode = file_get_mode_by_string(mode_str);
+    if(mode == FILE_MODE_INVALID){
+        response = -EINVARG;
+        goto out;
+    }
+    // call the open function located in the filesystem, it is abstracted out, now we have the private data
+    void* descriptor_private_date = disk->filesystem->open(disk, root_path->first, mode);
+    if(ISERR(descriptor_private_date)){
+        response = ERROR_I(descriptor_private_date);
+        goto out;
+    }
+    // create a new file descriptor
+    struct file_descriptor* desc = 0;
+    response = file_new_descriptor(&desc);
+    if(response < 0)
+        goto out;
+    // set the created descriptor data to the filesystem data of the opened file
+    desc->filesystem = disk->filesystem;
+    desc->private = descriptor_private_date;
+    desc->disk = disk;
+    response = desc->index;
+out:
+    // must return 0 at failure not -ve
+    if(response < 0)
+        return 0;
+    return response;
 }

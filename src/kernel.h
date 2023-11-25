@@ -13,7 +13,10 @@
 #include "fs/pparser.h"
 #include "fs/file.h"
 
-
 #define BOIOS_MAX_PATH  128
+
+#define ERROR(value)    (void*)(value)
+#define ERROR_I(value)  (int)(value)
+#define ISERR(value)    ((int)value < 0)
 
 #endif

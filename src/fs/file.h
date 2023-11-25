@@ -3,12 +3,14 @@
 
 #include "pparser.h"
 #include "fat/fat16.h"
+#include "../kernel.h"
 #include "../config.h"
 #include "../status.h"
 #include "../terminal/terminal.h"
 #include "../disk/disk.h"
 #include "../memory/memory.h"
 #include "../memory/heap/kheap.h"
+#include "../string/string.h"
 
 typedef unsigned int FILE_SEEK_MODE;
 typedef unsigned int FILE_MODE;
@@ -54,7 +56,7 @@ struct file_descriptor{
 };
 
 void fs_init(void);
-int fopen(const char* filename, const char* mode);
+int fopen(const char* filename, const char* mode_str);
 void fs_insert_filesystem(struct filesystem* filesystem);
 struct filesystem* fs_resolve(struct disk* disk);
 
