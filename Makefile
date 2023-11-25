@@ -69,7 +69,7 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	i686-elf-gcc $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/file.c -o ./build/fs/file.o
 
 ./build/fs/fat/fat16.o: ./src/fs/fat/fat16.c
-	i686-elf-gcc $(INCLUDES) -I./src/fat I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/fat/fat16.c -o ./build/fs/fat/fat16.o
+	i686-elf-gcc $(INCLUDES) -I./src/fat -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/fat/fat16.c -o ./build/fs/fat/fat16.o
 
 clean:
 	rm -rf ./bin/*.bin

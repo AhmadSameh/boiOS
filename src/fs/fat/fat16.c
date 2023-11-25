@@ -52,7 +52,6 @@ struct fat_h{
     union fat_h_e{
         struct fat_header_extended extended_header;
     } shared;
-
 };
 
 struct fat_directory_item{
@@ -116,8 +115,124 @@ struct filesystem* fat16_init(){
     return &fat16_fs;
 }
 
+static void fat16_init_private(struct disk* disk, struct fat_private* private){
+    memset(private, 0, sizeof(struct fat_private));
+    private->cluster_read_stream = diskstreamer_new(disk->id);
+    private->fat_read_stream = diskstreamer_new(disk->id);
+    private->directory_stream = diskstreamer_new(disk->id);
+}
+
+int fat16_sector_to_absolute(struct disk* disk, int sector){
+    return sector * disk->sector_size;
+}
+
+int fat16_get_total_items_for_directory(struct disk* disk, uint32_t directory_start_sector){
+    struct fat_directory_item item;
+    struct fat_directory_item empty_item;
+    memset(&empty_item, 0, sizeof(empty_item));
+    struct fat_private* fat_private = disk->fs_private;
+    int response = 0;
+    int i = 0;
+    int directory_start_pose = directory_start_sector * disk->sector_size;
+    // read from start of root directory, the number of items it contains
+    struct disk_stream* stream = fat_private->directory_stream;
+    if(diskstreamer_seek(stream, directory_start_pose) != BOIOS_ALL_OK) {
+        response = -EIO;
+        goto out;
+    }
+    while(1){
+        if(diskstreamer_read(stream, &item, sizeof(item)) != BOIOS_ALL_OK){
+            response = -EIO;
+            goto out;
+        }
+        // if blank record found, we are done 
+        if(item.file_name[0] == 0x00)
+            break;
+        // if item is unused, skip
+        if(item.file_name[5] == 0xE5)
+            continue;
+        i++;
+    }
+    response = i;
+out:
+    return response;
+}
+
+int fat16_get_root_directory(struct disk* disk, struct fat_private* fat_private, struct fat_directory* directory){
+    int response = 0;
+    // root details are extracted from the primary header
+    struct fat_header* primary_header = &fat_private->header.primary_header;
+    // the equation to get the root directory position on the sector
+    int root_dir_sector_pos = (primary_header->fat_copies * primary_header->sectors_per_fat) + primary_header->reserved_sectors;
+    int root_dir_entries = fat_private->header.primary_header.root_entries;
+    int root_dir_size = root_dir_entries * sizeof(struct fat_directory_item);
+    int total_sectors = root_dir_size / disk->sector_size;
+    if(root_dir_size % disk->sector_size)
+        total_sectors++;
+    // get total number of directories from the root directory sector position
+    int total_items = fat16_get_total_items_for_directory(disk, root_dir_sector_pos);
+    // allocate memory for directory and read the root directory into it
+    struct fat_directory_item* dir = kzalloc(root_dir_size);
+    if(!dir){
+        response = -ENOMEM;
+        goto out;
+    }
+    struct disk_stream* stream = fat_private->directory_stream;
+    // first seek the streamer to the root directory position
+    if(diskstreamer_seek(stream, fat16_sector_to_absolute(disk, root_dir_sector_pos)) != BOIOS_ALL_OK){
+        response = -EIO;
+        goto out;
+    }
+    if(diskstreamer_read(stream, dir, root_dir_size) != BOIOS_ALL_OK){
+        response = -EIO;
+        goto out;
+    }
+    directory->item = dir;
+    directory->total_items = total_items;
+    directory->sector_position = root_dir_sector_pos;
+    directory->ending_sector_position = root_dir_sector_pos + (root_dir_size / disk->sector_size);
+out:
+    return response;
+}
+
 int fat16_resolve(struct disk* disk){
-    return 0;
+    int response = 0;
+    // allocate memory for the private fat structure
+    struct fat_private* fat_private = kzalloc(sizeof(struct fat_private));
+    // initialize private data, bound to the disk, whenever it calls us, we access these private data
+    fat16_init_private(disk, fat_private);
+    disk->fs_private = fat_private;
+    disk->filesystem = &fat16_fs;
+    // create a streamer for the disk
+    struct disk_stream* stream = diskstreamer_new(disk->id);
+    if(!stream){
+        response = -ENOMEM;
+        goto out;
+    }
+    // read the first sector of the disk to get the header, and check if the header has the correct signature
+    if(diskstreamer_read(stream, &fat_private->header, sizeof(fat_private->header)) != BOIOS_ALL_OK){
+        response = -EIO;
+        goto out;
+    }
+    if(fat_private->header.shared.extended_header.signature != 0x29){
+        response = -EFSNOTUS;
+        goto out;
+    }
+    // get the root directory for the filesystem
+    if(fat16_get_root_directory(disk, fat_private, &fat_private->root_directory) != BOIOS_ALL_OK){
+        response = -EIO;
+        goto out;
+    }
+out:
+    // close stream after reading
+    if(stream)
+        diskstreamer_close(stream);
+    if(response < 0){
+        // unbind the private part from the dik
+        kfree(fat_private);
+        disk->fs_private = 0;
+    }
+    return response;
 }
 
 void* fat16_open(struct disk* disk, struct path_part* path, FILE_MODE mode){
