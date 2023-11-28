@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include "../file.h"
+#include "../../kernel.h"
+#include "../../config.h"
 #include "../../status.h"
 #include "../../disk/disk.h"
 #include "../../disk/streamer.h"

@@ -7,5 +7,6 @@
 #define ENOMEM          3 // no memory
 #define EBADPATH        4 // path invalid 
 #define EFSNOTUS        5
+#define ERDONLY         6 
 
 #endif

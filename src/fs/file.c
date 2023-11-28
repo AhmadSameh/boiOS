@@ -134,6 +134,6 @@ int fopen(const char* filename, const char* mode_str){
 out:
     // must return 0 at failure not -ve
     if(response < 0)
-        return 0;
+        response = 0;
     return response;
 }

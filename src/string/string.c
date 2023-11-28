@@ -17,7 +17,7 @@ size_t strnlen(const char* str, size_t max){
 
 size_t strnlen_terminator(const char* str, size_t max, char terminator){
     size_t len = 0;
-    while(str[len] && str[len] != terminator)
+    while(str[len] != '\0' && str[len] != terminator)
         len++;
     len = len > max ? max : len;
     return len;
@@ -43,7 +43,7 @@ char* strcpy(char* dest, char* src){
 }
 
 char tolower(char c){
-    if(c >= 65 && c <= 190)
+    if(c >= 65 && c <= 90)
         c += 32;
     return c;
 }

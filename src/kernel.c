@@ -6,7 +6,7 @@ static struct paging_4gb_chunk* kernel_chunk = 0;
 void kernel_main(){
     terminal_initialize();
     print("Hello World!\n");
-    print("This is my first kernel!");
+    print("This is my first kernel!\n");
 
     // initialize the heap
     kheap_init();
@@ -30,9 +30,8 @@ void kernel_main(){
     // enable interrupts
     enable_interrupts();
 
-    struct disk_stream* stream = diskstreamer_new(0);
-    diskstreamer_seek(stream, 0x201);
-    unsigned char c = 0;
-    diskstreamer_read(stream, &c, 1);
+    int fd = fopen("0:/hello.txt", "r");
+    if(fd)
+        print("we opened hello.txt!\n");
     while(1);
 }

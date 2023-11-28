@@ -17,4 +17,6 @@
 #define BOIOS_MAX_FILESYSTEMS       12
 #define BOIOS_MAX_FILE_DESCRIPTORS  512
 
+#define BOIOS_MAX_PATH  128
+
 #endif
