@@ -40,6 +40,8 @@ void kernel_main(){
         // print(buf);
         struct file_stat s;
         fstat(fd, &s);
+        fclose(fd);
+        print("test\n");
     }
     while(1);
 }

@@ -42,6 +42,11 @@ static struct file_descriptor* file_get_descriptor(int fd){
     return file_descriptors[index];
 }
 
+static void file_free_descriptor(struct file_descriptor* desc){
+    file_descriptors[desc->index - 1] = 0x00;
+    kfree(desc);
+}
+
 void fs_insert_filesystem(struct filesystem* filesystem){
     struct filesystem** fs = fs_get_free_filesystem();
     if(!fs){
@@ -186,6 +191,8 @@ int fclose(int fd){
         goto out;
     }
     response = desc->filesystem->close(desc->private);
+    if(response == BOIOS_ALL_OK)
+        file_free_descriptor(desc);
 out:
     return response;
 }
