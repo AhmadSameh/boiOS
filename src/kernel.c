@@ -2,6 +2,13 @@
 
 
 static struct paging_4gb_chunk* kernel_chunk = 0;
+struct gdt gdt_real[BOIOS_TOTAL_GDT_SEGMENTS];
+struct gdt_structured gdt_structured[BOIOS_TOTAL_GDT_SEGMENTS] = {
+    {.base = 0x00, .limit = 0x00,       .type = 0x00}, // NULL SEGMENT
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0X9A}, // kernel code segment
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x92}  // kernel data segment
+};
+
 
 void panic(const char* msg){
     print(msg);
@@ -12,6 +19,11 @@ void kernel_main(){
     terminal_initialize();
     print("Hello World!\n");
     print("This is my first kernel!\n");
+
+    // initialize gdt and load it
+    memset(gdt_real, 0x00, sizeof(gdt_real));
+    gdt_structured_to_gdt(gdt_real, gdt_structured, BOIOS_TOTAL_GDT_SEGMENTS);
+    gdt_load(gdt_real, sizeof(gdt_real));
 
     // initialize the heap
     kheap_init();

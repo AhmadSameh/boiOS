@@ -33,8 +33,6 @@
         SystemIDString          db 'FAT16   '
 ;-------------------------------------------------------------;
 
-
-
 start:
         jmp     0:step2 ; make code segment to 0x7c0
 

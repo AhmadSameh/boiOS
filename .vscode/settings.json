@@ -1,22 +1,4 @@
 {
-    "files.associations": {
-        "string.h": "c",
-        "config.h": "c",
-        "status.h": "c",
-        "kernel.h": "c",
-        "idt.h": "c",
-        "memory.h": "c",
-        "stdint.h": "c",
-        "terminal.h": "c",
-        "kheap.h": "c",
-        "heap.h": "c",
-        "paging.h": "c",
-        "*.ipp": "c",
-        "cstring": "c",
-        "*.tcc": "c",
-        "algorithm": "c",
-        "pparser.h": "c"
-    },
     "python.autoComplete.extraPaths": [
         "/home/boi/work_stuff/control/install/controller/lib/python3.10/site-packages",
         "/home/boi/work_stuff/control/install/controller_interface/local/lib/python3.10/dist-packages",
