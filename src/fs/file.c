@@ -177,3 +177,15 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd){
 out:
     return response;
 }
+
+int fclose(int fd){
+    int response = 0;
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        response = -EIO;
+        goto out;
+    }
+    response = desc->filesystem->close(desc->private);
+out:
+    return response;
+}
