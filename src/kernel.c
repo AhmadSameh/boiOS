@@ -31,7 +31,12 @@ void kernel_main(){
     enable_interrupts();
 
     int fd = fopen("0:/hello.txt", "r");
-    if(fd)
+    if(fd){
         print("we opened hello.txt!\n");
+        char buf[23];
+        fread(buf, 22, 1, fd);
+        buf[22] = 00;
+        print(buf);
+    }
     while(1);
 }
