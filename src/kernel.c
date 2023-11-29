@@ -34,7 +34,8 @@ void kernel_main(){
     if(fd){
         print("we opened hello.txt!\n");
         char buf[23];
-        fread(buf, 22, 1, fd);
+        fseek(fd, 2, SEEK_SET);
+        fread(buf, 20, 1, fd);
         buf[22] = 00;
         print(buf);
     }
