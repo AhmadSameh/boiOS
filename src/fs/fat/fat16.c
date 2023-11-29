@@ -400,6 +400,7 @@ struct fat_directory* fat16_load_fat_directory(struct disk* disk, struct fat_dir
         response = -ENOMEM;
         goto out;
     }
+    // calculate total items in cluster
     int cluster = fat16_get_first_cluster(item);
     int cluster_sector = fat16_cluster_to_sector(fat_private, cluster);
     int total_items = fat16_get_total_items_for_directory(disk, cluster_sector);

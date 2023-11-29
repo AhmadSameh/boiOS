@@ -137,3 +137,19 @@ out:
         response = 0;
     return response;
 }
+
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd){
+    int response = 0;
+    if(size == 0 || nmemb == 0 || fd < 1){
+        response = -EINVARG;
+        goto out;
+    }
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        response = -EINVARG;
+        goto out;
+    }
+    response = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char*)ptr);
+out:
+    return response;
+}
