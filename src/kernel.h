@@ -14,6 +14,7 @@
 #include "fs/pparser.h"
 #include "fs/file.h"
 #include "gdt/gdt.h"
+#include "task/tss.h"
 #include "config.h"
 
 #define BOIOS_MAX_PATH  128

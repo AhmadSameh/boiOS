@@ -19,6 +19,6 @@
 
 #define BOIOS_MAX_PATH  128
 
-#define BOIOS_TOTAL_GDT_SEGMENTS    3
+#define BOIOS_TOTAL_GDT_SEGMENTS    6
 
 #endif
