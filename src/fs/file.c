@@ -138,6 +138,18 @@ out:
     return response;
 }
 
+int fstat(int fd, struct file_stat* stat){
+    int response = 0;
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        response = -EIO;
+        goto out;
+    }
+    response = desc->filesystem->stat(desc->disk, desc->private, stat);
+out:
+    return response;
+}
+
 int fseek(int fd, int offset, FILE_SEEK_MODE whence){
     int response = 0;
     struct file_descriptor* desc = file_get_descriptor(fd);
