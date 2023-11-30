@@ -24,5 +24,6 @@ uint32_t* paging_4gb_chunk_get_directory(struct paging_4gb_chunk* chunk);
 void paging_switch(uint32_t* directory);
 void enable_paging(); // only called when the 4gb chunk is created and switched to a directory
 int paging_set(uint32_t* directory, void* virtual_address, uint32_t value_of_entry);
+void paging_free_4gb(struct paging_4gb_chunk* chunk);
 
 #endif

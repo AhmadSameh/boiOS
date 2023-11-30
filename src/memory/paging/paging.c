@@ -74,3 +74,13 @@ int paging_set(uint32_t* directory, void* virtual_address, uint32_t value_of_ent
 bool paging_is_aligned(void* address){
     return ((uint32_t)address % PAGING_PAGE_SIZE) == 0;
 }
+
+void paging_free_4gb(struct paging_4gb_chunk* chunk){
+    for(int i=0; i<PAGING_TOTAL_ENTRIES_PER_TABLE; i++){
+        uint32_t entry = chunk->directory_entry[i];
+        uint32_t* table = (uint32_t*)(entry & 0xFFFFF000); // clear flags to get actual page table address
+        kfree(table);
+    }
+    kfree(chunk->directory_entry);
+    kfree(chunk);
+}
