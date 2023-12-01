@@ -1,4 +1,5 @@
 #include "task.h"
+#include "process.h"
 
 struct task* current_task = 0;
 struct task* task_tail = 0;
@@ -8,7 +9,7 @@ struct task* task_current(){
     return current_task;
 }
 
-int task_init(struct task* task){
+int task_init(struct task* task, struct process* process){
     memset(task, 0, sizeof(struct task));
     // map entire 4gb address space to itself by creating a page directory for the task, read only address space
     task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
@@ -17,6 +18,7 @@ int task_init(struct task* task){
     task->registers.ip = BOIOS_PROGRAM_VIRTUAL_ADDRESS;
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.esp = BOISOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
+    task->process = process;
     return 0;
 }
 
@@ -45,14 +47,14 @@ int task_free(struct task *task){
 }
 
 // call this when in need to create a new task
-struct task* task_new(){
+struct task* task_new(struct process* process){
     int response = 0;
     struct task* task = kzalloc(sizeof(struct task));
     if(!task){
         response = -ENOMEM;
         goto out;
     }
-    response = task_init(task);
+    response = task_init(task, process);
     if(response != BOIOS_ALL_OK)
         goto out;
     if(task_head == 0){

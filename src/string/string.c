@@ -42,6 +42,17 @@ char* strcpy(char* dest, char* src){
     return res;
 }
 
+char* strncpy(char* dest, const char* src, int count){
+    int i;
+    for(i=0; i<count-1; i++){
+        if(src[i] == 0)
+            break;
+        dest[i] = src[i];
+    }
+    dest[i] = 0x00;
+    return dest;
+}
+
 char tolower(char c){
     if(c >= 65 && c <= 90)
         c += 32;

@@ -28,4 +28,7 @@
 #define USER_DATA_SEGMENT   0X23
 #define USER_CODE_SEGMENT   0x1B    // offsets from gdt 
 
+#define BOIOS_MAX_PROGRAM_ALLOCATIONS   1024
+#define BOIOS_MAX_PROCESSES 12
+
 #endif
