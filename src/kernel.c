@@ -1,5 +1,6 @@
 #include "kernel.h"
-
+#include "task/task.h"
+#include "task/process.h"
 
 static struct paging_4gb_chunk* kernel_chunk = 0;
 struct gdt gdt_real[BOIOS_TOTAL_GDT_SEGMENTS];
@@ -49,25 +50,20 @@ void kernel_main(){
     // setup paging
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     // switch to kernel paging chunk
-    paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
+    paging_switch(kernel_chunk);
     // enable paging
     enable_paging();
 
     // enable interrupts
-    enable_interrupts();
+    // enable_interrupts();
 
-    int fd = fopen("0:/hello.txt", "r");
-    if(fd){
-        // print("we opened hello.txt!\n");
-        // char buf[23];
-        // fseek(fd, 2, SEEK_SET);
-        // fread(buf, 20, 1, fd);
-        // buf[22] = 00;
-        // print(buf);
-        struct file_stat s;
-        fstat(fd, &s);
-        fclose(fd);
-        print("test\n");
-    }
+    struct process* process = 0;
+    int res = process_load("0:/blank.bin", &process);
+    if(res != BOIOS_ALL_OK)
+        panic("falied to load blank.bin\n");
+
+    task_run_first_ever_task();
+
+
     while(1);
 }

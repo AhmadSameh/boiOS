@@ -5,28 +5,35 @@ struct task* current_task = 0;
 struct task* task_tail = 0;
 struct task* task_head = 0;
 
-void task_run_first_ever_task(){
-    if(!current_task)
-        panic("task_run_first_ever_task(): no current task exists!\n");
-    task_switch(task_head);
-    task_return(&task_head->registers);
-}
+int task_init(struct task* task, struct process* process);
 
-struct task* task_current(){
-    return current_task;
-}
-
-int task_switch(struct task* task){
-    current_task = task;
-    paging_switch(task->page_directory->directory_entry);
-    return 0;
-}
-
-// takes us out of the kernel page directory and load us into the task page directory
-int task_page(){
-    user_registers();
-    task_switch(current_task);
-    return 0;
+// call this when in need to create a new task
+struct task* task_new(struct process* process){
+    int response = 0;
+    struct task* task = kzalloc(sizeof(struct task));
+    if(!task){
+        response = -ENOMEM;
+        goto out;
+    }
+    response = task_init(task, process);
+    if(response != BOIOS_ALL_OK)
+        goto out;
+    if(task_head == 0){
+        task_head = task;
+        task_tail = task;
+        current_task = task;
+        goto out;
+    }
+    // add task to the tail of the list
+    task_tail->next = task;
+    task->prev = task_tail;
+    task_tail = task;
+out:
+    if(ISERR(response)){
+        task_free(task);
+        return ERROR(response);
+    }
+    return task;
 }
 
 int task_init(struct task* task, struct process* process){
@@ -37,8 +44,33 @@ int task_init(struct task* task, struct process* process){
         return -EIO;
     task->registers.ip = BOIOS_PROGRAM_VIRTUAL_ADDRESS;
     task->registers.ss = USER_DATA_SEGMENT;
+    task->registers.cs = USER_CODE_SEGMENT;
     task->registers.esp = BOISOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
     task->process = process;
+    return 0;
+}
+
+void task_run_first_ever_task(){
+    if(!current_task)
+        panic("task_run_first_ever_task(): no current task exists!\n");
+    task_switch(task_head);
+    task_return(&task_head->registers);
+}
+
+int task_switch(struct task* task){
+    current_task = task;
+    paging_switch(task->page_directory);
+    return 0;
+}
+
+struct task* task_current(){
+    return current_task;
+}
+
+// takes us out of the kernel page directory and load us into the task page directory
+int task_page(){
+    user_registers();
+    task_switch(current_task);
     return 0;
 }
 
@@ -66,30 +98,3 @@ int task_free(struct task *task){
     return 0;
 }
 
-// call this when in need to create a new task
-struct task* task_new(struct process* process){
-    int response = 0;
-    struct task* task = kzalloc(sizeof(struct task));
-    if(!task){
-        response = -ENOMEM;
-        goto out;
-    }
-    response = task_init(task, process);
-    if(response != BOIOS_ALL_OK)
-        goto out;
-    if(task_head == 0){
-        task_head = task;
-        task_tail = task;
-        goto out;
-    }
-    // add task to the tail of the list
-    task_tail->next = task;
-    task->prev = task_tail;
-    task_tail = task;
-out:
-    if(ISERR(response)){
-        task_free(task);
-        return ERROR(response);
-    }
-    return task;
-}

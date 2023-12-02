@@ -8,11 +8,12 @@ size_t strlen(const char* str){
 }
 
 size_t strnlen(const char* str, size_t max){
-    size_t len = 0;
-    while(str[len])
-        len++;
-    len = len > max ? max : len;
-    return len;
+    int i = 0;
+    for (i=0; i<max; i++){
+        if(str[i] == 0)
+            break;
+    }
+    return i;
 }
 
 size_t strnlen_terminator(const char* str, size_t max, char terminator){
