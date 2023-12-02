@@ -5,8 +5,28 @@ struct task* current_task = 0;
 struct task* task_tail = 0;
 struct task* task_head = 0;
 
+void task_run_first_ever_task(){
+    if(!current_task)
+        panic("task_run_first_ever_task(): no current task exists!\n");
+    task_switch(task_head);
+    task_return(&task_head->registers);
+}
+
 struct task* task_current(){
     return current_task;
+}
+
+int task_switch(struct task* task){
+    current_task = task;
+    paging_switch(task->page_directory->directory_entry);
+    return 0;
+}
+
+// takes us out of the kernel page directory and load us into the task page directory
+int task_page(){
+    user_registers();
+    task_switch(current_task);
+    return 0;
 }
 
 int task_init(struct task* task, struct process* process){
