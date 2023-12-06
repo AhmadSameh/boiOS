@@ -24,5 +24,7 @@
 #define ISERR(value)    ((int)value < 0)
 
 void panic(const char* msg);
+void kernel_page(void);
+void kernel_registers(void);
 
 #endif

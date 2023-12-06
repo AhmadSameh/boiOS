@@ -7,6 +7,8 @@
 #include "../memory/paging/paging.h"
 #include "../memory/heap/kheap.h"
 
+struct interrupt_frame;
+
 struct registers{
     uint32_t edi;
     uint32_t esi;
@@ -38,9 +40,13 @@ struct task* task_get_next(void);
 int task_free(struct task *task);
 int task_switch(struct task* task);
 int task_page(void);
+int task_page_task(struct task* task);
 void task_run_first_ever_task(void);
-void task_return(struct registers *regs);
+void user_mode_enter(struct registers *regs);
 void restore_general_purpose_registers(struct registers* regs);
 void user_registers(void);
+void task_current_save_state(struct interrupt_frame* frame);
+int copy_string_from_task(struct task* task, void* virual_address, void* physical_address, int max);
+void* task_get_stack_item(struct task* task, int index);
 
 #endif

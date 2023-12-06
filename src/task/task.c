@@ -1,5 +1,8 @@
 #include "task.h"
 #include "process.h"
+#include "../idt/idt.h"
+#include "../string/string.h"
+#include "../memory/paging/paging.h"
 
 struct task* current_task = 0;
 struct task* task_tail = 0;
@@ -54,7 +57,7 @@ void task_run_first_ever_task(){
     if(!current_task)
         panic("task_run_first_ever_task(): no current task exists!\n");
     task_switch(task_head);
-    task_return(&task_head->registers);
+    user_mode_enter(&task_head->registers);
 }
 
 int task_switch(struct task* task){
@@ -71,6 +74,12 @@ struct task* task_current(){
 int task_page(){
     user_registers();
     task_switch(current_task);
+    return 0;
+}
+
+int task_page_task(struct task* task){
+    user_registers();
+    paging_switch(task->page_directory);
     return 0;
 }
 
@@ -98,3 +107,65 @@ int task_free(struct task *task){
     return 0;
 }
 
+void task_save_state(struct task* task, struct interrupt_frame* frame){
+    task->registers.ip = frame->ip;
+    task->registers.cs = frame->cs;
+    task->registers.flags = frame->flags;
+    task->registers.esp = frame->esp;
+    task->registers.ss = frame->ss;
+    task->registers.eax = frame->eax;
+    task->registers.ebp = frame->ebp;
+    task->registers.ebx = frame->ebx;
+    task->registers.ecx = frame->ecx;
+    task->registers.edi = frame->edi;
+    task->registers.edx = frame->edx;
+    task->registers.esi = frame->esi;
+}
+
+void task_current_save_state(struct interrupt_frame* frame){
+    if(task_current() == 0)
+        panic("no current task to save.\n");
+    struct task* task = task_current();
+    task_save_state(task, frame);
+}
+
+int copy_string_from_task(struct task* task, void* virual_address, void* physical_address, int max){
+    int res = 0;
+    if(max >= PAGING_PAGE_SIZE){
+        res = -EINVARG;
+        goto out;
+    }
+    char* tmp = kzalloc(max);
+    if(tmp == 0){
+        res = -ENOMEM;
+        goto out;
+    }
+    uint32_t* task_directory = task->page_directory->directory_entry;
+    uint32_t old_entry = paging_get(task_directory, tmp);
+    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    paging_switch(task->page_directory);
+    strncpy(tmp, virual_address, max);
+    kernel_page();
+    res = paging_set(task_directory, tmp, old_entry);
+    if(res < 0){
+        res = -EIO;
+        goto out_free;
+    }
+    strncpy(physical_address, tmp, max);
+out_free:
+    kfree(tmp);
+out:
+    return res;
+}
+
+void* task_get_stack_item(struct task* task, int index){
+    void* res = 0;
+    // access stack as it was right before the interrupt
+    uint32_t* sp_ptr = (uint32_t*)task->registers.esp;
+    // switch to given tasks page
+    task_page_task(task);
+    res = (void*)sp_ptr[index];
+    // switch bback to kernel page
+    kernel_page();
+    return res;
+}

@@ -121,6 +121,11 @@ out:
 int process_map_memory(struct process* process){
     int res = 0;
     res = process_map_binary(process);
+    if(res < 0)
+        goto out;
+    // map the stack, giving the task access to write to it
+    paging_map_to(process->task->page_directory, (void*)BOIOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack, paging_align_address(process->stack + BOIOS_USER_PROGRAM_STACK_SIZE), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+out:
     return res;
 }
 

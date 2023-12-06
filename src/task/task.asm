@@ -1,10 +1,10 @@
     bits    32
     section .asm
     global  restore_general_purpose_registers
-    global  task_return
+    global  user_mode_enter
     global  user_registers
     
-task_return:
+user_mode_enter:
     mov     ebp, esp
     ; push data segment (ss)
     ; push stack address
@@ -17,7 +17,7 @@ task_return:
     push    dword [ebx+44]
     ; push stack pointer
     push    dword [ebx+40]
-    ; push flags
+    ; push flags, oring interrupt bits
     pushf
     pop     eax
     or      eax, 0x200

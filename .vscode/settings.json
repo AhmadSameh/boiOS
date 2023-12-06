@@ -15,6 +15,7 @@
         "status.h": "c",
         "process.h": "c",
         "kernel.h": "c",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "idt.h": "c"
     }
 }

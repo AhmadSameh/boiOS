@@ -7,6 +7,9 @@
 #include "memory/memory.h"
 #include "io/io.h"
 
+struct interrupt_frame;
+typedef void*(*ISR80H_COMMAND)(struct interrupt_frame* frame);
+
 struct idt_desc{
     uint16_t offset_1; // offset bits 0-15
     uint16_t selector; // selector that's in our gdt, kernel code selector
@@ -20,14 +23,28 @@ struct idtr_desc{
     uint32_t base;  // base address of the start of the idt
 } __attribute__((packed));
 
+struct interrupt_frame{
+    uint32_t edi;
+    uint32_t esi;
+    uint32_t ebp;
+    uint32_t reserved;
+    uint32_t ebx;
+    uint32_t edx;
+    uint32_t ecx;
+    uint32_t eax;
+    uint32_t ip;
+    uint32_t cs;
+    uint32_t flags;
+    uint32_t esp;
+    uint32_t ss;
+}__attribute__((packed));
+
 void idt_init(void);
 void idt_set(int interrupt_no, void* address);
 void enable_interrupts(void);
 void disable_interrupts(void);
-extern void idt_load(struct idtr_desc* ptr);
-extern void int21h(void);
-extern void no_interrupt(void);
 void int21h_handler(void);
 void no_interrupt_handler(void);
+void isr80h_register_command(int command_id, ISR80H_COMMAND command);
 
 #endif

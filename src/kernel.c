@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "task/task.h"
 #include "task/process.h"
+#include "isr80h/isr80h.h"
 
 static struct paging_4gb_chunk* kernel_chunk = 0;
 struct gdt gdt_real[BOIOS_TOTAL_GDT_SEGMENTS];
@@ -17,6 +18,11 @@ struct gdt_structured gdt_structured[BOIOS_TOTAL_GDT_SEGMENTS] = {
 void panic(const char* msg){
     print(msg);
     while(1);
+}
+
+void kernel_page(){
+    kernel_registers();
+    paging_switch(kernel_chunk);
 }
 
 void kernel_main(){
@@ -56,7 +62,9 @@ void kernel_main(){
 
     // enable interrupts
     // enable_interrupts();
-
+    
+    // register kernel command
+    isr80h_register_commands();
     struct process* process = 0;
     int res = process_load("0:/blank.bin", &process);
     if(res != BOIOS_ALL_OK)
