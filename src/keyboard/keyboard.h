@@ -11,6 +11,7 @@ struct keyboard{
     struct keyboard* next;
 };
 
+int keyboard_insert(struct keyboard* keyboard);
 void keyboard_init(void);
 void keyboard_push(char c);
 char keyboard_pop(void);

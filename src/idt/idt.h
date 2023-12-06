@@ -43,7 +43,6 @@ void idt_init(void);
 void idt_set(int interrupt_no, void* address);
 void enable_interrupts(void);
 void disable_interrupts(void);
-void int21h_handler(void);
 void no_interrupt_handler(void);
 void isr80h_register_command(int command_id, ISR80H_COMMAND command);
 
