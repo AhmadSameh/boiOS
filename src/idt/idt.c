@@ -5,6 +5,7 @@
 struct idt_desc idt_descriptors[BOIOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
 
+static INTERRUPT_CALLBACK_FUNCTION interrupt_callbacks[BOIOS_TOTAL_INTERRUPTS];
 static ISR80H_COMMAND isr80h_commands[BOIOS_MAX_ISR80H_COMMANDS];
 extern void idt_load(struct idtr_desc* ptr);
 extern void no_interrupt(void);
@@ -40,7 +41,24 @@ void no_interrupt_handler(){
 }
 
 void interrupt_handler(int interrupt, struct interrupt_frame* interrupt_frame){
+    kernel_page();
+    if(interrupt_callbacks[interrupt] != 0){
+        task_current_save_state(interrupt_frame);
+        interrupt_callbacks[interrupt](interrupt_frame);
+    }
+    task_page();
     outb(0x20, 0x20);
+}
+
+int idt_retgister_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION interrupt_callback){
+    int res = BOIOS_ALL_OK;
+    if(interrupt < 0 || interrupt >= BOIOS_TOTAL_INTERRUPTS){
+        res = -EINVARG;
+        goto out;
+    }
+    interrupt_callbacks[interrupt] = interrupt_callback;
+out:
+    return res;
 }
 
 void isr80h_register_command(int command_id, ISR80H_COMMAND command){
