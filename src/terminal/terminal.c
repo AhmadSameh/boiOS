@@ -20,10 +20,30 @@ uint16_t terminal_make_char(char c, char color){
     return (color << 8) | c;
 }
 
+void terminal_backspace(){
+    if(terminal.terminal_col == 0 && terminal.terminal_row == 0)
+        return;
+    if(terminal.terminal_col == 0){
+        terminal.terminal_row--;
+        terminal.terminal_col = VGA_WIDTH;
+    }
+    terminal.terminal_col--;
+    terminal_writechar(' ', 15);
+    if(terminal.terminal_col == 0){
+        terminal.terminal_row--;
+        terminal.terminal_col = VGA_WIDTH;
+    }
+    terminal.terminal_col--;
+}
+
 void terminal_writechar(char c, char color){
     if(c == '\n'){
         terminal.terminal_row += 1;
         terminal.terminal_col = 0;
+        return;
+    }
+    if(c == 0x08){
+        terminal_backspace();
         return;
     }
     terminal_putchar(terminal.terminal_col, terminal.terminal_row, c, color);
