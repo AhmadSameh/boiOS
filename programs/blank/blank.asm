@@ -3,12 +3,14 @@
     global _start
 
 _start:
+
+_loop:
     call    get_key
-    push    message 
-    mov     eax, 1 
+    push    eax
+    mov     eax, 3  
     int     0x80
     add     esp, 4 
-    jmp     $
+    jmp     _loop
 
 get_key:
     mov     eax, 2 ; command get key
