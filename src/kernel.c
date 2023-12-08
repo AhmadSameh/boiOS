@@ -26,10 +26,6 @@ void kernel_page(){
     paging_switch(kernel_chunk);
 }
 
-void pic_timer_callback(struct interrupt_frame* frame){
-    print("timer activated\n");
-}
-
 void kernel_main(){
     terminal_initialize();
 
@@ -71,14 +67,12 @@ void kernel_main(){
 
     // initialize all system keyboards
     keyboard_init();
-    idt_retgister_interrupt_callback(0x20, pic_timer_callback);
 
     struct process* process = 0;
     int res = process_load_switch("0:/blank.bin", &process);
     if(res != BOIOS_ALL_OK)
         panic("falied to load blank.bin\n");
 
-    keyboard_push('A');
     task_run_first_ever_task();
 
     while(1);

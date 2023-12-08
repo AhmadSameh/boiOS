@@ -9,7 +9,7 @@
 
 struct interrupt_frame;
 typedef void*(*ISR80H_COMMAND)(struct interrupt_frame* frame);
-typedef void(*INTERRUPT_CALLBACK_FUNCTION)(struct interrupt_frame* frame);
+typedef void(*INTERRUPT_CALLBACK_FUNCTION)();
 
 struct idt_desc{
     uint16_t offset_1; // offset bits 0-15
