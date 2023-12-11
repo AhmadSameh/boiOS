@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include "streamer.h"
 
 struct disk_stream* diskstreamer_new(int disk_id){
@@ -17,22 +18,25 @@ int diskstreamer_seek(struct disk_stream* stream, int position){
 
 // read from streamer total amount of bytes into the out pointer
 int diskstreamer_read(struct disk_stream* stream, void* out, int total){
-    int sector = stream->position /BOIOS_SECTOR_SIZE;
+    int sector = stream->position / BOIOS_SECTOR_SIZE;
     int offset = stream->position % BOIOS_SECTOR_SIZE;
+    int total_to_read = total;
+    bool overflow = (offset + total_to_read) >= BOIOS_SECTOR_SIZE;
     char buf[BOIOS_SECTOR_SIZE];
+    if(overflow)
+        total_to_read -= (offset + total_to_read) - BOIOS_SECTOR_SIZE;
 
     int response = disk_read_block(stream->disk, sector, 1, buf);
     if(response < 0)
         goto out;
-    int total_to_read = total > BOIOS_SECTOR_SIZE ? BOIOS_SECTOR_SIZE : total;
     // read from buffer where sector is loaded into out
     for(int i=0; i<total_to_read; i++)
         *(char*)out++ = buf[offset + i];
     // adjust stream
     stream->position += total_to_read;
     // recursion is used to read past the first sector, out points to end of sector at all times
-    if(total > BOIOS_SECTOR_SIZE)
-        response = diskstreamer_read(stream, out, total-BOIOS_SECTOR_SIZE);
+    if(overflow)
+        response = diskstreamer_read(stream, out, total-total_to_read);
 out:
     return response;
 }
