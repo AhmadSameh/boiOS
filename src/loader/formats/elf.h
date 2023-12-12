@@ -68,6 +68,12 @@
 
 #define SHN_UNDEF 0 // value marks an undefined, missing, irrelevant, or otherwise meaningless section reference
 
+// elf file signature 4 bytes
+#define ELFMAG0 0x7F
+#define ELFMAG1 0x45 // E
+#define ELFMAG2 0x4C // L
+#define ELFMAG3 0x46 // F
+
 typedef uint16_t elf32_half; 
 typedef uint32_t elf32_word;
 typedef int32_t elf32_sword;
@@ -161,5 +167,8 @@ struct elf32_sym{
     unsigned char   st_other; // currently holds 0 and has no defined meaning
     elf32_half  st_shndx; // Every symbol table entry is "defined" in relation to some section; this member holds the relevant section header table index
 }__attribute__((packed));
+
+void* elf_get_entry_pointer(struct elf32_header* elf_header);
+uint32_t elf_get_entry(struct elf32_header* elf_header);
 
 #endif
