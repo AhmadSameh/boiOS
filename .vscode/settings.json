@@ -17,7 +17,10 @@
         "kernel.h": "c",
         "*.def": "cpp",
         "idt.h": "c",
-        "terminal.h": "c"
+        "terminal.h": "c",
+        "elfloader.h": "c",
+        "config.h": "c",
+        "elf.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

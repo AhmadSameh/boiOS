@@ -4,7 +4,12 @@
 #include <stdint.h>
 #include "task.h"
 #include "../config.h"
+#include "../loader/formats/elfloader.h"
 
+#define PROCESS_FILE_TYPE_ELF    0
+#define PROCESS_FILE_TYPE_BIN    1
+
+typedef unsigned char PROCESS_FILE_TYPE;
 
 struct process{
     uint16_t pid;
@@ -13,8 +18,14 @@ struct process{
     struct task* task;
     // keep track of allocations memory so it can be freed later
     void* allocations[BOIOS_MAX_PROGRAM_ALLOCATIONS];
+    
+    PROCESS_FILE_TYPE filetype;
+
     // physical pointer to process memory
-    void* ptr;
+    union{
+        void* ptr;
+        struct elf_file* elf_file;
+    };
     // phyiscal pointer to stack memory
     void* stack;
     // size of data pointed to by ptr
