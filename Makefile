@@ -112,9 +112,11 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	i686-elf-gcc $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/elfloader.c -o ./build/loader/formats/elfloader.o
 
 user_programs:
+	cd ./programs/stdlib && $(MAKE) all
 	cd ./programs/blank && $(MAKE) all
 
 programs_clean:
+	cd ./programs/stdlib && $(MAKE) clean 
 	cd ./programs/blank && $(MAKE) clean
 
 clean: programs_clean
