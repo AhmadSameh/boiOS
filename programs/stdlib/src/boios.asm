@@ -1,6 +1,9 @@
-    bits 32
-    global print:function ; ensure elf symbol type is a function
-    global getkey:function
+    bits    32
+    section     .asm
+    global  print:function ; ensure elf symbol type is a function
+    global  getkey:function
+    global  boios_malloc:function
+    global boios_free:function
 
 ; void print(const char* msg)
 print:
@@ -19,5 +22,27 @@ getkey:
     mov     ebp, esp
     mov     eax, 2 ; command getkey
     int     0x80
+    pop     ebp
+    ret
+
+; void* boios_malloc(size_t size)
+boios_malloc:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, 4 ; command malloc
+    push    dword[ebp+8]
+    int     0x80
+    add     esp, 4
+    pop     ebp
+    ret
+
+; void boios_free(void* ptr)
+boios_free:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, 5
+    push    dword[ebp+8]
+    int     0x80
+    add     esp, 4
     pop     ebp
     ret

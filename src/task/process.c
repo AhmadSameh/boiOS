@@ -8,6 +8,7 @@
 #include "../fs/file.h"
 #include "../string/string.h"
 #include "../loader/formats/elfloader.h"
+#include <stdbool.h>
 
 struct process* current_process = 0;
 static struct process* processes[BOIOS_MAX_PROCESSES];
@@ -193,6 +194,50 @@ int process_map_stack(struct process* process){
     int res = 0;
     res = paging_map_to(process->task->page_directory, (void*)BOIOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack, paging_align_address(process->stack + BOIOS_USER_PROGRAM_STACK_SIZE), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
     return res;
+}
+
+static int process_find_free_allocation_index(struct process* process){
+    int res = -ENOMEM;
+    for(int i=0; i<BOIOS_MAX_PROGRAM_ALLOCATIONS; i++){
+        if(process->allocations[i] == 0){
+            res = i;
+            break;
+        }
+    }
+    return res;
+}
+
+void* process_malloc(struct process* process, size_t size){
+    void* ptr = kzalloc(size);
+    if(ptr == 0)
+        return 0;
+    int index = process_find_free_allocation_index(process);
+    if(index < 0)
+        return 0;
+    process->allocations[index] = ptr;
+    return ptr;
+}
+
+static bool process_is_process_ptr(struct process* process, void* ptr){
+    for(int i=0; i<BOIOS_MAX_PROGRAM_ALLOCATIONS; i++){
+        if(process->allocations[i] == ptr)
+            return true;
+    }
+    return false;
+}
+
+static void process_allocation_unjoin(struct process* process, void* ptr){
+    for(int i=0; i<BOIOS_MAX_PROGRAM_ALLOCATIONS; i++){
+        if(process->allocations[i] == ptr)
+            process->allocations[i] = 0x00;
+    }
+}
+
+void process_free(struct process* process, void* ptr){
+    if(!process_is_process_ptr(process, ptr))
+        return;
+    process_allocation_unjoin(process, ptr);
+    kfree(ptr);
 }
 
 /*************************************************helper functions*************************************************/
