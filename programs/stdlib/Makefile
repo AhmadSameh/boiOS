@@ -1,4 +1,4 @@
-FILES = ./build/start.o 
+FILES = ./build/start.o ./build/boios.o
 INCLUDES = 
 
 
@@ -7,6 +7,10 @@ all: ${FILES}
 
 ./build/start.o: ./src/start.asm
 	nasm -f elf ./src/start.asm -o ./build/start.o
+
+./build/boios.o: ./src/boios.asm
+	nasm -f elf ./src/boios.asm -o ./build/boios.o
+
 
 clean:
 	rm -rf ${FILES}

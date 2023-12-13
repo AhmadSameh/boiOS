@@ -1,5 +1,5 @@
 FILES = ./build/blank.o 
-INCLUDES = 
+INCLUDES = -I../stdlib/src
 
 
 all: ${FILES}
