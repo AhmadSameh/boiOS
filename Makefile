@@ -12,6 +12,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	# copy a file over
 	sudo cp ./hello.txt /mnt/d
 	sudo cp ./programs/blank/blank.elf /mnt/d
+	sudo cp ./programs/shell/shell.elf /mnt/d
 	sudo umount /mnt/d
 
 ./bin/kernel.bin: $(FILES)
@@ -117,10 +118,12 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 user_programs:
 	cd ./programs/stdlib && $(MAKE) all
 	cd ./programs/blank && $(MAKE) all
+	cd ./programs/shell && $(MAKE) all
 
 programs_clean:
 	cd ./programs/stdlib && $(MAKE) clean 
 	cd ./programs/blank && $(MAKE) clean
+	cd ./programs/shell && $(MAKE) clean
 
 clean: programs_clean
 	rm -rf ./bin/*.bin
