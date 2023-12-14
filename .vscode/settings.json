@@ -22,7 +22,8 @@
         "config.h": "c",
         "elf.h": "c",
         "heap.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "stdlib.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

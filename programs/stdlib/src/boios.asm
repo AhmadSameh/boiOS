@@ -1,7 +1,7 @@
     bits    32
     section     .asm
     global  print:function ; ensure elf symbol type is a function
-    global  getkey:function
+    global  boios_getkey:function
     global  boios_malloc:function
     global  boios_free:function
     global  boios_putchar:function
@@ -18,7 +18,7 @@ print:
     ret
 
 ; int getkey()
-getkey:
+boios_getkey:
     push    ebp
     mov     ebp, esp
     mov     eax, 2 ; command getkey
