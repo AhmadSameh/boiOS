@@ -21,7 +21,8 @@
         "elfloader.h": "c",
         "config.h": "c",
         "elf.h": "c",
-        "heap.h": "c"
+        "heap.h": "c",
+        "stddef.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
