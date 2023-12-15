@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 int main(int argc, char** argv){
+    printf("Hello, Friend\n");
     while(1){
     }
     return 0;

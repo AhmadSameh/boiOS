@@ -42,6 +42,14 @@ void terminal_writechar(char c, char color){
         terminal.terminal_col = 0;
         return;
     }
+    if(c == '\t'){
+        terminal.terminal_col += 4;
+        if(terminal.terminal_col >= VGA_WIDTH){
+            terminal.terminal_row += 1;
+            terminal.terminal_col = 0;
+        }
+        return;
+    }
     if(c == 0x08){
         terminal_backspace();
         return;

@@ -16,6 +16,8 @@ void boios_terminal_readline(char* out, int max, bool output_while_typing){
         // read line when pressing enter
         if(key == 13)
             break;
+        if(key == 0x1E)
+            continue;
         if(output_while_typing)
             boios_putchar(key);
         // backspace
