@@ -74,10 +74,10 @@ void classic_keyboard_handle_interrupt(){
     }
     uint8_t character = classic_keyboard_scancode_to_char(scancode);
     if(character != 0){
-        if(character == CAPS_LCK)
-            is_caps_on = !is_caps_on;
-        if(!is_caps_on && character <= 90 && character >= 65)
-            character += 32;
+        // if(character == CAPS_LCK)
+        //     is_caps_on = !is_caps_on;
+        // if(!is_caps_on && character <= 90 && character >= 65)
+        //     character += 32;
         keyboard_push(character);
     }
     task_page();
