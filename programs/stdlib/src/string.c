@@ -93,7 +93,7 @@ char* strtok(char* str, const char* delimeters){
     int len = strlen(delimeters);
     if(str == 0 && sp == 0)
         return 0;
-    if(str && sp == 0)
+    if(str != 0 && sp == 0)
         sp = str;
     char* p_start = sp;
     while(1){
