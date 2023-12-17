@@ -12,13 +12,18 @@
 
 typedef unsigned char PROCESS_FILE_TYPE;
 
+struct process_allocation{
+    void* ptr;
+    size_t size;
+};
+
 struct process{
     uint16_t pid;
     char filename[BOIOS_MAX_PATH];
     // main process task
     struct task* task;
     // keep track of allocations memory so it can be freed later
-    void* allocations[BOIOS_MAX_PROGRAM_ALLOCATIONS];
+    struct process_allocation allocations[BOIOS_MAX_PROGRAM_ALLOCATIONS];
     
     PROCESS_FILE_TYPE filetype;
 
