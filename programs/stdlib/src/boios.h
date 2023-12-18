@@ -9,6 +9,11 @@ struct command_argument{
     struct command_argument* next;
 };
 
+struct process_arguments{
+    int argc;
+    char** argv;
+};
+
 struct command_argument* boios_parse_command(const char* command, int max);
 void print(const char* msg);
 int boios_getkey(void);
@@ -18,5 +23,6 @@ void boios_putchar(char c);
 void* boios_malloc(size_t size);
 void boios_free(void* ptr);
 void boios_process_load_start(const char* filename);
+void boios_process_get_arguments(struct process_arguments* arguments);
 
 #endif

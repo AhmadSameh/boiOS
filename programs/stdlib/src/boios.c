@@ -61,3 +61,4 @@ void boios_terminal_readline(char* out, int max, bool output_while_typing){
     }
     out[i] = 0x00;
 }
+

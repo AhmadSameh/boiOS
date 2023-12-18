@@ -6,10 +6,9 @@
 
 
 int main(int argc, char** argv){
-    char str[] = "Hello Friend";
-    struct command_argument* root_command = boios_parse_command(str, sizeof(str));
-    printf("%s\n", root_command->argument);
-    printf("%s\n", root_command->next->argument);
+    struct process_arguments arguments;
+    boios_process_get_arguments(&arguments);
+    printf("%i %s\n", arguments.argc, arguments.argv[0]);
     while(1){
     }
     return 0;
