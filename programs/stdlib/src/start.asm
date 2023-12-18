@@ -1,8 +1,8 @@
     bits    32
     section .asm
     global _start
-    extern main
+    extern c_start
 
 _start:
-    call main
+    call c_start
     ret
