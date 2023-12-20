@@ -51,6 +51,7 @@ struct keyboard classic_keyboard = {
 
 int classic_keyboard_init(){
     idt_retgister_interrupt_callback(ISR_KEYBOARD_INTERRUPT, classic_keyboard_handle_interrupt);
+    keyboard_set_capslock(&classic_keyboard, KEYBOARD_CAPS_LOCK_OFF);    
     outb(PS2_PORT, PS2_COMMAND_ENABLE_FIRST_PORT);
     return 0;
 }
@@ -60,6 +61,10 @@ uint8_t classic_keyboard_scancode_to_char(uint8_t scancode){
     if(scancode > size_of_keyboard_set_one)
         return 0; 
     uint8_t c = keyboard_scan_set_one[scancode];
+    if(keyboard_get_capslock(&classic_keyboard) == KEYBOARD_CAPS_LOCK_OFF){
+        if(c >= 'A' && c <= 'Z')
+            c += 32;
+    }
     return c;
 }
 
@@ -73,13 +78,8 @@ void classic_keyboard_handle_interrupt(){
         return;
     }
     uint8_t character = classic_keyboard_scancode_to_char(scancode);
-    if(character != 0){
-        // if(character == CAPS_LCK)
-        //     is_caps_on = !is_caps_on;
-        // if(!is_caps_on && character <= 90 && character >= 65)
-        //     character += 32;
+    if(character != 0)
         keyboard_push(character);
-    }
     task_page();
 }
 

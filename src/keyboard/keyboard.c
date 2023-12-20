@@ -31,6 +31,14 @@ out:
     return res;
 }
 
+void keyboard_set_capslock(struct keyboard* keyboard, KEYBOARD_CAPS_LOCK_STATE state){
+    keyboard->capslock_state = state;
+}
+
+KEYBOARD_CAPS_LOCK_STATE keyboard_get_capslock(struct keyboard* keyboard){
+    return keyboard->capslock_state;
+}
+
 void keyboard_push(char c){
     struct process* process = process_current();
     if(process == 0)
