@@ -69,6 +69,14 @@ int task_switch(struct task* task){
     return 0;
 }
 
+void task_next(){
+    struct task* next_task = task_get_next();
+    if(!next_task)
+        panic("no more tasks to run");
+    task_switch(next_task);
+    user_mode_enter(&next_task->registers);
+}
+
 struct task* task_current(){
     return current_task;
 }

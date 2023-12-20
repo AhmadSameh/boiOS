@@ -1,6 +1,7 @@
 #include "idt.h"
-#include "../kernel.h"
-#include "../task/task.h"
+#include "kernel.h"
+#include "task/task.h"
+#include "task/process.h"
 
 struct idt_desc idt_descriptors[BOIOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
@@ -16,6 +17,11 @@ void idt_zero(){
     print("Divide by zero error\n");
 }
 
+void idt_handle_exception(){
+    process_terminate(task_current()->process);
+    task_next();
+}
+
 void idt_init(){
     memset(idt_descriptors, 0, sizeof(idt_descriptors));
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1;
@@ -24,6 +30,10 @@ void idt_init(){
         idt_set(i, interrupt_pointer_table[i]);
     idt_set(0, idt_zero);
     idt_set(0x80, isr80h_wrapper);
+    for(int i=0; i<0x20; i++){
+        idt_retgister_interrupt_callback(i, idt_handle_exception);
+    }
+    idt_load(&idtr_descriptor);
 }
 
 void idt_set(int interrupt_no, void* address){

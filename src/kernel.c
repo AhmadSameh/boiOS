@@ -73,11 +73,6 @@ void kernel_main(){
     if(res != BOIOS_ALL_OK)
         panic("falied to load blank.elf\n");
 
-    // struct command_argument argument;
-    // argument.next = NULL;
-    // strcpy(argument.argument, "testing...");
-    // process_inject_arguments(process, &argument);
-
     task_run_first_ever_task();
 
     while(1);
