@@ -6,6 +6,7 @@
     global  boios_free:function
     global  boios_putchar:function
     global  boios_process_load_start:function
+    global  boios_system:function
     global  boios_process_get_arguments:function
 
 ; void print(const char* msg)
@@ -67,6 +68,17 @@ boios_process_load_start:
     mov     ebp, esp
     mov     eax, 6 ; command process load start
     push    dword[ebp+8]
+    int     0x80
+    add     esp, 4
+    pop     ebp
+    ret
+
+; int boios_system(struct command_argument* arguments)
+boios_system:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, 7 ; Command 7 process_system ( runs a system command based on the arguments)
+    push    dword[ebp+8] ; Variable "arguments"
     int     0x80
     add     esp, 4
     pop     ebp
