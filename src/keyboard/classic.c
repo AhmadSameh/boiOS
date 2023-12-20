@@ -19,7 +19,7 @@ static uint8_t keyboard_scan_set_one[] = {
     'H',       'J',      'K',  'L',  ';',     '\'',     '`',  // 35 -> 41
     LFT_SHFT, '\\',      'Z',  'X',  'C',      'V',     'B',  // 42 -> 48
     'N',       'M',      ',',  '.',  '/', RIT_SHFT,     '*',  // 49 -> 55
-    LFT_ALT, SPACE, CAPS_LCK,   F1,   F2,       F3,      F4,  // 56 -> 62
+    LFT_ALT, SPACE,     0x00,   F1,   F2,       F3,      F4,  // 56 -> 62
     F5,         F6,       F7,   F8,   F9,      F10, NUM_LCK,  // 63 -> 69
     SCRL_LCK,  '7',      '8',  '9',  '-',      '4',     '5',  // 70 -> 76 
     '6',       '+',      '1',  '2',  '3',      '0',     '.'   // 77 -> 83
@@ -76,6 +76,10 @@ void classic_keyboard_handle_interrupt(){
     if(scancode & CLASSIC_KEYBOARD_KEY_RELEASED){
         task_page();
         return;
+    }
+    if(scancode == CLASSIC_KEYBOARD_CAPS_LOCK){
+        KEYBOARD_CAPS_LOCK_STATE old_state = keyboard_get_capslock(&classic_keyboard);
+        keyboard_set_capslock(&classic_keyboard, old_state == KEYBOARD_CAPS_LOCK_ON ? KEYBOARD_CAPS_LOCK_OFF : KEYBOARD_CAPS_LOCK_ON);
     }
     uint8_t character = classic_keyboard_scancode_to_char(scancode);
     if(character != 0)

@@ -14,7 +14,7 @@
 #define LFT_SHFT 0x1E // TODO: change value
 #define RIT_SHFT 0x1E // TODO: change value
 #define LFT_ALT  0x1E // TODO: change value
-#define CAPS_LCK 0x1E // TODO: change value
+#define CLASSIC_KEYBOARD_CAPS_LOCK 0x3A 
 #define F1       0x1E // TODO: change value
 #define F2       0x1E // TODO: change value
 #define F3       0x1E // TODO: change value
@@ -27,7 +27,6 @@
 #define F10      0x1E // TODO: change value
 #define NUM_LCK  0x1E // TODO: change value
 #define SCRL_LCK 0x1E // TODO: change value
-
 
 #define CLASSIC_KEYBOARD_KEY_RELEASED   0x80
 #define ISR_KEYBOARD_INTERRUPT  0x21 

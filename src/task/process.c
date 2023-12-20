@@ -124,6 +124,7 @@ out:
 
 static int process_load_binary(const char* filename, struct process* process){
     int res = 0;
+    void* program_data_ptr = 0x00;
     int fd = fopen(filename, "r");
     if(!fd){
         res = -EIO;
@@ -133,7 +134,7 @@ static int process_load_binary(const char* filename, struct process* process){
     res = fstat(fd, &stat);
     if(res != BOIOS_ALL_OK)
         goto out;
-    void* program_data_ptr = kzalloc(stat.file_size);
+    program_data_ptr = kzalloc(stat.file_size);
     if(!program_data_ptr){
         res = -ENOMEM;
         goto out;
@@ -146,6 +147,8 @@ static int process_load_binary(const char* filename, struct process* process){
     process->ptr = program_data_ptr;
     process->size = stat.file_size;
 out:
+    if(res < 0 && program_data_ptr)
+        kfree(program_data_ptr);
     fclose(fd);
     return res;
 } 
