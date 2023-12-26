@@ -31,7 +31,7 @@ no_interrupt:
     pushad
     call    no_interrupt_handler
     popad
-    sti
+    ; sti
     iret
 
 %macro interrupt 1

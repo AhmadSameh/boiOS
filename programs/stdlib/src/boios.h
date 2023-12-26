@@ -27,5 +27,8 @@ int boios_system(struct command_argument* arguments);
 void boios_process_get_arguments(struct process_arguments* arguments);
 int boios_system_run(const char* command);
 void boios_exit(void);
+int boios_fopen(const char* filename);
+void boios_sleep(int millis);
+void boios_clr_terminal(void);
 
 #endif

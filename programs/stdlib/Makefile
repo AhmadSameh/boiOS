@@ -1,4 +1,4 @@
-FILES = ./build/start.asm.o ./build/start.o ./build/boios.asm.o ./build/boios.o ./build/stdlib.o ./build/stdio.o ./build/memory.o ./build/string.o
+FILES = ./build/start.asm.o ./build/start.o ./build/boios.asm.o ./build/boios.o ./build/stdlib.o ./build/stdio.o ./build/memory.o ./build/string.o ./build/unistd.o
 INCLUDES = -I./src
 FLAGS = -g -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -29,6 +29,10 @@ all: ${FILES}
 
 ./build/memory.o: ./src/memory.c
 	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/memory.c -o ./build/memory.o
+
+./build/unistd.o: ./src/unistd.c
+	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/unistd.c -o ./build/unistd.o
+
 
 clean:
 	rm -rf ${FILES}

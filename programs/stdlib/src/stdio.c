@@ -29,3 +29,15 @@ int printf(const char* format, ...){
     va_end(ap);
     return 0;
 }
+
+int fopen(const char* file){
+    int test = (int)boios_fopen(file);
+    if(test){
+        printf("%d\n", test);
+    }
+    return test;
+}
+
+void clrscr(void){
+    boios_clr_terminal();
+}

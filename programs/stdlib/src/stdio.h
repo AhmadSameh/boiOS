@@ -3,5 +3,7 @@
 
 int putchar(int c);
 int printf(const char* format, ...);
+int fopen(const char* file);
+void clrscr(void);
 
 #endif

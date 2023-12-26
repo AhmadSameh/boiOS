@@ -2,6 +2,7 @@
 #include "kernel.h"
 #include "task/task.h"
 #include "task/process.h"
+#include "timer/pit.h"
 
 struct idt_desc idt_descriptors[BOIOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
@@ -14,6 +15,7 @@ extern void isr80h_wrapper(void);
 extern void* interrupt_pointer_table[BOIOS_TOTAL_INTERRUPTS];
 
 void idt_zero(){
+    outb(0x20, 0x20);
     print("Divide by zero error\n");
 }
 
@@ -24,7 +26,8 @@ void idt_handle_exception(){
 
 void idt_clock(){
     outb(0x20, 0x20);
-    task_next();
+    // task_next();
+    print("\ntestinidashfiduasghf\n");
 }
 
 void idt_init(){
@@ -33,13 +36,18 @@ void idt_init(){
     idtr_descriptor.base = (uint32_t)idt_descriptors;
     for(int i=0; i<BOIOS_TOTAL_INTERRUPTS; i++)
         idt_set(i, interrupt_pointer_table[i]);
+    
     idt_set(0, idt_zero);
     idt_set(0x80, isr80h_wrapper);
+
     for(int i=0; i<0x20; i++){
         idt_retgister_interrupt_callback(i, idt_handle_exception);
     }
-    // idt_retgister_interrupt_callback(0x20, idt_clock);
+    // idt_retgister_interrupt_callback(0x20, idt_zero);
+    idt_retgister_interrupt_callback(0x20, pit_callback);
     idt_load(&idtr_descriptor);
+    // enable_interrupts();
+    
 }
 
 void idt_set(int interrupt_no, void* address){
@@ -49,7 +57,7 @@ void idt_set(int interrupt_no, void* address){
     desc->zero = 0;
     desc->type_attr = 0xEE;
     desc->offset_2 = (uint32_t) address >> 16;
-    idt_load(&idtr_descriptor);
+    // idt_load(&idtr_descriptor);
 }
 
 void no_interrupt_handler(){
@@ -73,6 +81,17 @@ int idt_retgister_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION 
         goto out;
     }
     interrupt_callbacks[interrupt] = interrupt_callback;
+out:
+    return res;
+}
+
+int idt_unregister_interrupt_callback(int interrupt){
+    int res = BOIOS_ALL_OK;
+    if(interrupt < 0 || interrupt >= BOIOS_TOTAL_INTERRUPTS){
+        res = -EINVARG;
+        goto out;
+    }
+    interrupt_callbacks[interrupt] = 0x00;
 out:
     return res;
 }

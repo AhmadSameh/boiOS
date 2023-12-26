@@ -9,6 +9,9 @@
     global  boios_system:function
     global  boios_process_get_arguments:function
     global  boios_exit:function
+    global  boios_fopen:function
+    global  boios_sleep:function
+    global  boios_clr_terminal:function
 
 ; void print(const char* msg)
 print:
@@ -101,6 +104,37 @@ boios_exit:
     push    ebp
     mov     ebp, esp
     mov     eax, 9 ; command get process args
+    int     0x80
+    pop     ebp
+    ret
+
+; int boios_fopen(const char* filename)
+boios_fopen:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, 10 
+    push    dword[ebp+8] ; Variable "arguments"
+    int     0x80
+    add     esp, 4
+    pop     ebp
+    ret
+
+; int boios_sleep(int millis)
+boios_sleep:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, 11 
+    push    dword[ebp+8] ; Variable "arguments"
+    int     0x80
+    add     esp, 4
+    pop     ebp
+    ret
+
+; void boios_clr_terminal(void)
+boios_clr_terminal:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, 12
     int     0x80
     pop     ebp
     ret

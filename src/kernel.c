@@ -3,6 +3,8 @@
 #include "task/process.h"
 #include "isr80h/isr80h.h"
 #include "keyboard/keyboard.h"
+#include "isr80h/io.h"
+#include "timer/pit.h"
 
 static struct paging_4gb_chunk* kernel_chunk = 0;
 struct gdt gdt_real[BOIOS_TOTAL_GDT_SEGMENTS];
@@ -45,6 +47,7 @@ void kernel_main(){
 
     // initialize interrupt descriptor table
     idt_init();
+    pit_init(100);
 
     // setup and load tss
     memset(&tss, 0x00, sizeof(tss));
@@ -65,15 +68,15 @@ void kernel_main(){
     // register kernel command
     isr80h_register_commands();
 
-    // initialize all system keyboards
+    // initialize all system keyboards    
     keyboard_init();
 
     struct process* process = 0;
     int res = process_load_switch("0:/shell.elf", &process);
-    if(res != BOIOS_ALL_OK)
-        panic("falied to load shell.elf\n");
+    if (res != BOIOS_ALL_OK)
+        panic("Failed to load shell.elf\n");
+    task_run_first_ever_task();  
 
-    task_run_first_ever_task();
 
     while(1);
 }

@@ -6,7 +6,7 @@
 #include "../string/string.h"
 
 #define VGA_WIDTH   80
-#define VGA_HEIGHT  20
+#define VGA_HEIGHT  25
 
 struct terminal{
     uint16_t* video_mem;
