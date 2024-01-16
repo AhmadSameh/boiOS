@@ -10,6 +10,8 @@
 ![image](https://github.com/AhmadSameh/boiOS/assets/65093152/ee4aebad-eac6-4434-bd03-613cefd7f42f)
 ##### The timer was used for this printing just to emulate a booting process and is not the actual time needed to boot  
 
+##### And this is when the shell runs
+![image](https://github.com/AhmadSameh/boiOS/assets/65093152/c0189412-9bfc-4932-a911-96a8bc9d4f89)
 ##### Note that the only process I can call so far is an echo
 
 ## Future Plans
